@@ -1,15 +1,9 @@
 package auth
 
 import "errors"
+import "musebot"
 
-type Authenticator interface {
-	Setup(map[string]string)
-
-	CanChangePassword() bool
-	ChangePassword(string, string) (bool, error)
-
-	CheckLogin(string, string) (bool, error)
-}
+type Authenticator musebot.Authenticator
 
 func Authenticators() []Authenticator {
 	return []Authenticator{&ConfigFileAuth{}}

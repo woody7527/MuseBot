@@ -11,5 +11,13 @@
 		"auth.ConfigFileAuth": {
 			"lukegb": "password"
 		}
+	},
+
+	"ProviderBackendConfig": {
+		"provider.GroovesharkProvider": {
+			"clientName": "mobileshark",
+			"clientRevision": "20120227",
+			"clientRevToken": "someThumbsUp"
+		}
 	}
 }

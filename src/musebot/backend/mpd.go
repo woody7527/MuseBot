@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/gompd/mpd"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"log"
 	"musebot"
 	"os"
@@ -20,13 +21,16 @@ func constructSongInfo(songDetails mpd.Attrs, m *MpdBackend) *musebot.SongInfo {
 		musicUrl = "file://" + m.musicDir + musicUrl
 	}
 
+	stickermap, _ := m.client.StickerGet("song", songDetails["file"], "coverarturl")
+
 	si := musebot.SongInfo{
-		Title:    songDetails["Title"],
-		Album:    songDetails["Album"],
-		Artist:   songDetails["Artist"],
-		MusicUrl: musicUrl,
-		Length:   int(length),
-		Id:       songDetails["Id"],
+		Title:       songDetails["Title"],
+		Album:       songDetails["Album"],
+		Artist:      songDetails["Artist"],
+		MusicUrl:    musicUrl,
+		CoverArtUrl: stickermap["coverarturl"],
+		Length:      int(length),
+		Id:          songDetails["Id"],
 	}
 	return &si
 }
@@ -114,8 +118,10 @@ func (m *MpdBackend) Add(s musebot.SongInfo) error {
 	path := s.MusicUrl
 
 	// this should be a local filesystem path by now...
-	if path[0] != '/' {
-		log.Panicln("ERROR: RECEIVED NON-ABSOLUTE PATH!")
+	if len(path) == 0 || path[0] != '/' {
+		err := errors.New("MpdBackend: path invalid for song with path " + path)
+		log.Println("Error adding song to queue: non-absolute path!", err)
+		return err
 	}
 
 	if !strings.HasPrefix(path, m.musicDir) {
@@ -132,6 +138,8 @@ func (m *MpdBackend) Add(s musebot.SongInfo) error {
 	// defer this
 	defer m.forcePlayback()
 
+	m.client.StickerSet("song", s.MusicUrl, "coverarturl", s.CoverArtUrl)
+
 	return m.client.Add(s.MusicUrl)
 
 }
@@ -145,19 +153,21 @@ func (m *MpdBackend) Remove(s musebot.SongInfo) error {
 	return m.client.DeleteId(int(intId))
 }
 
-func (m *MpdBackend) CurrentSong() (musebot.CurrentSongInfo, bool) {
+func (m *MpdBackend) CurrentSong() (musebot.CurrentSongInfo, bool, error) {
 	currentInfo, err := m.client.Status()
 	if err != nil {
-		log.Fatalln("ERROR WHILST FETCHING STATUS FROM MPD!")
+		log.Println("Error fetching status from MPD:", err)
+		return musebot.CurrentSongInfo{}, false, err
 	}
 
 	if currentInfo["state"] != "play" {
-		return musebot.CurrentSongInfo{}, false
+		return musebot.CurrentSongInfo{}, false, nil
 	}
 
 	songDetails, err := m.client.CurrentSong()
 	if err != nil {
-		log.Fatalln("ERROR WHILST FETCHING CURRENT SONG FROM MPD!")
+		log.Println("Error fetching current song from MPD:", err)
+		return musebot.CurrentSongInfo{}, false, err
 	}
 
 	pos, _ := strconv.ParseFloat(currentInfo["elapsed"], 32)
@@ -167,13 +177,14 @@ func (m *MpdBackend) CurrentSong() (musebot.CurrentSongInfo, bool) {
 	}
 	csi.SongInfo = *constructSongInfo(songDetails, m)
 
-	return csi, true
+	return csi, true, nil
 }
 
-func (m *MpdBackend) PlaybackQueue() []musebot.SongInfo {
+func (m *MpdBackend) PlaybackQueue() ([]musebot.SongInfo, error) {
 	songInfo, err := m.client.PlaylistInfo(-1, -1)
 	if err != nil {
-		log.Fatalln("ERROR WHILST FETCHING PLAYLIST")
+		log.Println("Error fetching playlist from MPD:", err)
+		return nil, err
 	}
 
 	outputSongInfo := make([]musebot.SongInfo, len(songInfo))
@@ -182,5 +193,5 @@ func (m *MpdBackend) PlaybackQueue() []musebot.SongInfo {
 		outputSongInfo[i] = *constructSongInfo(songInfo[i], m)
 	}
 
-	return outputSongInfo
+	return outputSongInfo, nil
 }
