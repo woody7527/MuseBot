@@ -1,0 +1,15 @@
+{
+	"Backend": "backend.MpdBackend",
+	"BackendConfig": {
+		"backend.MpdBackend": {
+			"musicDir": "/home/lukegb/music/"
+		}
+	},
+
+	"AuthBackend": "auth.ConfigFileAuth",
+	"AuthBackendConfig": {
+		"auth.ConfigFileAuth": {
+			"lukegb": "password"
+		}
+	}
+}
