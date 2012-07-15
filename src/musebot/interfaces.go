@@ -5,7 +5,7 @@ type Provider interface {
 
 	Search(string) ([]SongInfo, error)
 	UpdateSongInfo(*SongInfo) error
-	FetchSong(*SongInfo) (chan string, error)
+	FetchSong(*SongInfo, chan ProviderMessage)
 }
 
 type Backend interface {
@@ -24,4 +24,9 @@ type Authenticator interface {
 	ChangePassword(string, string) (bool, error)
 
 	CheckLogin(string, string) (bool, error)
+}
+
+type ProviderMessage struct {
+	Type    string
+	Content interface{}
 }

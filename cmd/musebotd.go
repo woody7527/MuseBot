@@ -115,8 +115,21 @@ func main() {
 
 	log.Println(authenticator, backend, backendChan, providers)
 
+	searchRes, err := providers["provider.GroovesharkProvider"].Search("Escape From The City")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fetchChan := make(chan musebot.ProviderMessage, 1000)
+	time.Sleep(1)
+	log.Println(searchRes[0].Title)
+	searchRes[0].Title = "BLATANTLY WRONG"
+	log.Println(searchRes[0].Title)
+	searchRes[0].Provider.UpdateSongInfo(&searchRes[0])
+	log.Println(searchRes[0].Title)
+
+	go searchRes[0].Provider.FetchSong(&searchRes[0], fetchChan)
+
 	for {
-		//log.Println(backend.PlaybackQueue())
-		time.Sleep(5 * time.Second)
+		log.Println(<-fetchChan)
 	}
 }

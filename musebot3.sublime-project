@@ -1,0 +1,15 @@
+{
+	"folders":
+	[
+		{
+			"path": "/home/lukegb/Projects/musebot3"
+		}
+	],
+	"settings": {
+		"GoSublime": {
+			"env": {
+				"GOPATH": "/home/lukegb/go:/home/lukegb/Projects/musebot3"
+			}
+		}
+	}
+}

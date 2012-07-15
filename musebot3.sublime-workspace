@@ -1,0 +1,657 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"groovesh",
+				"groovesharkHeaders	map[string]interface ʈ"
+			],
+			[
+				"gener",
+				"generateNewRandomizer	string ƒ"
+			],
+			[
+				"Encode",
+				"EncodeToString	string ƒ"
+			],
+			[
+				"grooveshar",
+				"groovesharkConfigHtml5	struct ʈ"
+			],
+			[
+				"provi",
+				"providerName	 ν"
+			],
+			[
+				"Encod",
+				"EncodeToString	string ƒ"
+			],
+			[
+				"Play",
+				"PlaylistInfo	pls []mpd.Attrs, err error ƒ"
+			],
+			[
+				"ba",
+				"backendChan	chan string ν"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/musebot/songinfo.go",
+			"settings":
+			{
+				"buffer_size": 476,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/musebot/interfaces.go",
+			"settings":
+			{
+				"buffer_size": 633,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/musebot/provider/provider.go",
+			"settings":
+			{
+				"buffer_size": 1314,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/musebot/provider/grooveshark.go",
+			"settings":
+			{
+				"buffer_size": 10221,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/lukegb/gs.core.cleanedup.js",
+			"settings":
+			{
+				"buffer_size": 690823,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/lukegb/gs.app.cleanedup.js",
+			"settings":
+			{
+				"buffer_size": 1083740,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/musebot/config.go",
+			"settings":
+			{
+				"buffer_size": 578,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "config.json",
+			"settings":
+			{
+				"buffer_size": 601,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "cmd/musebotd.go",
+			"settings":
+			{
+				"buffer_size": 3775,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/lukegb/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 71,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/lukegb/.config/sublime-text-2/Packages/GoSublime/GoSublime.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 1463,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/lukegb/.config/sublime-text-2/Packages/User/GoSublime.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 2,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"Gosublime: play/ru",
+				"GoSublime: Play/Run (current file only)"
+			],
+			[
+				"Run",
+				"GoSublime: Play/Run (current file only)"
+			],
+			[
+				"GoSublime: Ru",
+				"GoSublime: Fmt the current file (without saving it)"
+			],
+			[
+				"Package Control: Insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/lukegb/.config/sublime-text-2/Packages/User/Distraction Free.sublime-settings",
+		"/home/lukegb/.config/sublime-text-2/Packages/User/JSON.sublime-settings",
+		"/home/lukegb/.config/sublime-text-2/Packages/User/GoSublime.sublime-settings",
+		"/home/lukegb/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+		"/home/lukegb/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/home/lukegb/Projects/musebot3/src/musebotd.go",
+		"/home/lukegb/Projects/musebot3/config.json",
+		"/home/lukegb/Projects/musebot3/src/musebot/backend/mpd.go",
+		"/home/lukegb/Projects/musebot3/src/musebot/provider/provider.go",
+		"/home/lukegb/Projects/musebot3/src/musebot/backend/backend.go",
+		"/home/lukegb/Projects/musebot3/src/musebot/provider/grooveshark.go",
+		"/home/lukegb/Projects/musebot3/src/musebot/config.go",
+		"/home/lukegb/Projects/musebot3/src/musebot/auth/auth.go",
+		"/home/lukegb/go/src/code.google.com/p/gompd/mpd/client.go",
+		"/home/lukegb/Projects/musebot3/src/musebot/auth/configfileauth.go",
+		"/home/lukegb/Projects/musebot3/src/musebot/songinfo.go",
+		"/home/lukegb/.config/sublime-text-2/Packages/GoSublime/CHANGELOG.md"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"FromSongID",
+			"getQueueSongListFrom",
+			"GS.Models.Song",
+			"apiCall(",
+			"OK",
+			"//",
+			"hex",
+			"string",
+			"log.Println",
+			"Sha256",
+			"endpoint",
+			"hex",
+			"sha256",
+			"hex",
+			"mar1nagb",
+			"errors.",
+			"errosr.",
+			"musebot.",
+			"fatalln",
+			"coverarturl",
+			"covertarturl",
+			"constructSong",
+			"Id:",
+			"si",
+			"sfintf",
+			"backend"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"",
+			"csi",
+			"si",
+			"authenticator"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 11,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/musebot/songinfo.go",
+					"settings":
+					{
+						"buffer_size": 476,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15,
+								15
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Go/Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/musebot/interfaces.go",
+					"settings":
+					{
+						"buffer_size": 633,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								188,
+								188
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Go/Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/musebot/provider/provider.go",
+					"settings":
+					{
+						"buffer_size": 1314,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1204,
+								1204
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Go/Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 180.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/musebot/provider/grooveshark.go",
+					"settings":
+					{
+						"buffer_size": 10221,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								148,
+								148
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Go/Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 45.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/home/lukegb/gs.core.cleanedup.js",
+					"settings":
+					{
+						"buffer_size": 690823,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								686847,
+								686847
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 196607.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/home/lukegb/gs.app.cleanedup.js",
+					"settings":
+					{
+						"buffer_size": 1083740,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								312545,
+								312545
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 86185.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/musebot/config.go",
+					"settings":
+					{
+						"buffer_size": 578,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								444,
+								444
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Go/Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "config.json",
+					"settings":
+					{
+						"buffer_size": 601,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "cmd/musebotd.go",
+					"settings":
+					{
+						"buffer_size": 3775,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3278,
+								3278
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Go/Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1170.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/home/lukegb/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 71,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								68,
+								68
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/home/lukegb/.config/sublime-text-2/Packages/GoSublime/GoSublime.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 1463,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								216,
+								216
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "/home/lukegb/.config/sublime-text-2/Packages/User/GoSublime.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 2,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1,
+								1
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.GsDoc-output":
+	{
+		"height": 100.0
+	},
+	"output.exec":
+	{
+		"height": 175.0
+	},
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}

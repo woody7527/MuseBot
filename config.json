@@ -15,9 +15,13 @@
 
 	"ProviderBackendConfig": {
 		"provider.GroovesharkProvider": {
-			"clientName": "mobileshark",
-			"clientRevision": "20120227",
-			"clientRevToken": "someThumbsUp"
+			"playbackClientName": "mobileshark",
+			"playbackClientRevision": "20120227",
+			"playbackClientRevToken": "someThumbsUp",
+			"clientName": "htmlshark",
+			"clientRevision": "20120312",
+			"clientRevToken": "reallyHotSauce",
+			"cacheDir": "/home/lukegb/cache/grooveshark/"
 		}
 	}
 }

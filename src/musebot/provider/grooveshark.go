@@ -10,6 +10,7 @@ import (
 	"hash"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"musebot"
 	"net/http"
 	"strings"
@@ -35,9 +36,18 @@ type groovesharkConfigHtml5 struct {
 	SessionID string
 }
 
+type GroovesharkClientConfig struct {
+	Name     string
+	RevToken string
+	Revision string
+}
+
 type GroovesharkProvider struct {
-	info   groovesharkInfo
-	client *http.Client
+	info     groovesharkInfo
+	cacheDir string
+	client   *http.Client
+	normal   GroovesharkClientConfig
+	playback GroovesharkClientConfig
 }
 
 /* 
@@ -67,6 +77,39 @@ func magicHeaders(req *http.Request) {
 	req.Header.Add("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.3")
 }
 
+func generateGroovesharkUuid() string {
+	// "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+	// for x, random hex digit
+	// for y, random (number & 3 | 8) to hex
+	startStr := "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+	resultStr := ""
+	for i := 0; i < len(startStr); i++ {
+		char := startStr[i]
+		appendStr := ""
+		if char != 'x' && char != 'y' {
+			appendStr = string([]byte{char})
+		} else if char == 'x' {
+			appendStr = (hex.EncodeToString([]byte{byte(rand.Intn(15))}))[1:]
+		} else if char == 'y' {
+			appendStr = (hex.EncodeToString([]byte{byte(rand.Intn(3) + 8)}))[1:]
+		}
+		resultStr += appendStr
+	}
+
+	return resultStr
+}
+
+func generateNewRandomizer(lastRandomizer string) string {
+	outputStr := ""
+	for i := 0; i < 6; i++ {
+		outputStr += (hex.EncodeToString([]byte{byte(rand.Intn(15))}))[1:]
+	}
+	if outputStr == lastRandomizer {
+		return generateNewRandomizer(lastRandomizer)
+	}
+	return outputStr
+}
+
 func (p *GroovesharkProvider) fetchWebPage(url string) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	magicHeaders(req)
@@ -92,6 +135,23 @@ func (p *GroovesharkProvider) apiCall(method string, parameters interface{}) (in
 
 	// okay, now...
 	readySetGo["header"] = p.info.headers
+
+	// set up the client correctly:
+	var clientObject GroovesharkClientConfig
+	if method == "getStreamKeyFromSongIDEx" {
+		log.Println("YAY")
+		clientObject = p.playback
+	} else {
+		clientObject = p.normal
+	}
+	(readySetGo["header"].(groovesharkHeaders))["client"] = clientObject.Name
+	(readySetGo["header"].(groovesharkHeaders))["clientRevision"] = clientObject.Revision
+
+	// now we need to do stuff with tokens...
+	if p.info.currentToken != "" {
+		p.info.lastRandomizer = generateNewRandomizer(p.info.lastRandomizer)
+		(readySetGo["header"].(groovesharkHeaders))["token"] = p.info.lastRandomizer + hexSha1(method+":"+p.info.currentToken+":"+clientObject.RevToken+":"+p.info.lastRandomizer)
+	}
 
 	/*	log.Println("CALLING GS API", endpoint)
 		log.Println("METHOD:", method)
@@ -135,7 +195,7 @@ func (p *GroovesharkProvider) apiCall(method string, parameters interface{}) (in
 
 func (p *GroovesharkProvider) updateCommsToken() error {
 	params := map[string]string{}
-	params["secretKey"] = hexMd5(p.info.sessionID + "qqq")
+	params["secretKey"] = hexMd5(p.info.sessionID)
 
 	resp, err := p.apiCall("getCommunicationToken", params)
 	if err != nil {
@@ -160,6 +220,12 @@ func (p *GroovesharkProvider) Setup(cfg map[string]string) error {
 
 	p.info = groovesharkInfo{}
 	p.info.headers = groovesharkHeaders{}
+	cacheDir, cok := cfg["cacheDir"]
+
+	if !cok {
+		return errors.New("Grooveshark Provider: cacheDir (the directory where I store files) must be provided!")
+	}
+	p.cacheDir = cacheDir
 
 	clientName, nok := cfg["clientName"]
 	clientRevision, rok := cfg["clientRevision"]
@@ -169,9 +235,27 @@ func (p *GroovesharkProvider) Setup(cfg map[string]string) error {
 		return errors.New("Grooveshark Provider: clientName/clientRevision/clientRevToken were missing from configuration.")
 	}
 
-	p.info.headers["client"] = clientName
-	p.info.headers["clientRevision"] = clientRevision
-	p.info.revToken = clientRevToken
+	p.normal = GroovesharkClientConfig{
+		Name:     clientName,
+		Revision: clientRevision,
+		RevToken: clientRevToken,
+	}
+
+	clientName, nok = cfg["playbackClientName"]
+	clientRevision, rok = cfg["playbackClientRevision"]
+	clientRevToken, rtok = cfg["playbackClientRevToken"]
+
+	if !nok || !rok || !rtok {
+		return errors.New("Grooveshark Provider: playbackClientName/playbackClientRevision/playbackClientRevToken were missing from configuration.")
+	}
+
+	p.playback = GroovesharkClientConfig{
+		Name:     clientName,
+		Revision: clientRevision,
+		RevToken: clientRevToken,
+	}
+
+	p.info.currentToken = ""
 
 	// generate an HTTP client
 	p.client = &http.Client{}
@@ -196,7 +280,7 @@ func (p *GroovesharkProvider) Setup(cfg map[string]string) error {
 	p.info.runMode = gsFromPage.RunMode
 	p.info.headers["session"] = gsFromPage.SessionID
 	p.info.sessionID = gsFromPage.SessionID
-	p.info.headers["uuid"] = "F245429D-5952-439C-B174-B97357124C46" // TODO: generate this at runtime
+	p.info.headers["uuid"] = generateGroovesharkUuid()
 	p.info.headers["privacy"] = "0"
 	p.info.endpoint = "more.php"
 
@@ -212,14 +296,125 @@ func (p *GroovesharkProvider) Setup(cfg map[string]string) error {
 	return nil
 }
 
-func (p *GroovesharkProvider) Search(string) ([]musebot.SongInfo, error) {
-	return make([]musebot.SongInfo, 0), errors.New("Unimplemented")
+func (p *GroovesharkProvider) groovesharkSongToMuseBotSong(r map[string]interface{}, song *musebot.SongInfo) {
+	coverArtFn := r["CoverArtFilename"].(string)
+	if coverArtFn == "" {
+		coverArtFn = "http://images.grooveshark.com/static/albums/500_default.png"
+	} else {
+		coverArtFn = "http://images.grooveshark.com/static/albums/500_" + coverArtFn
+	}
+	Title, ok := r["SongName"].(string)
+	if !ok {
+		Title = r["Name"].(string)
+	}
+	song.Title = Title
+	song.Artist = r["ArtistName"].(string)
+	song.Album = r["AlbumName"].(string)
+	song.CoverArtUrl = coverArtFn
+	song.Provider = p
+	song.ProviderId = r["SongID"].(string)
 }
 
-func (p *GroovesharkProvider) UpdateSongInfo(*musebot.SongInfo) error {
-	return errors.New("Unimplemented")
+func (p *GroovesharkProvider) Search(query string) ([]musebot.SongInfo, error) {
+	// api call is "getResultsFromSearch"
+	parameters := map[string]string{"query": query, "type": "Songs", "guts": "1"}
+	result, err := p.apiCall("getResultsFromSearch", parameters)
+	if err != nil {
+		return make([]musebot.SongInfo, 0), err
+	}
+
+	resultArrNotYet := ((((result.(map[string]interface{}))["result"]).(map[string]interface{}))["result"])
+	resultArr := resultArrNotYet.([]interface{})
+	finalResultArr := make([]musebot.SongInfo, len(resultArr))
+
+	for i := 0; i < len(resultArr); i++ {
+		r := resultArr[i].(map[string]interface{})
+		song := new(musebot.SongInfo)
+		p.groovesharkSongToMuseBotSong(r, song)
+		finalResultArr[i] = *song
+	}
+
+	return finalResultArr, nil
 }
 
-func (p *GroovesharkProvider) FetchSong(*musebot.SongInfo) (chan string, error) {
-	return make(chan string), errors.New("Unimplemented")
+func (p *GroovesharkProvider) UpdateSongInfo(song *musebot.SongInfo) error {
+	if song.Provider != p {
+		// buh?
+		return errors.New("Song was not from this provider!")
+	}
+
+	params := map[string]interface{}{}
+	params["songIDs"] = []string{song.ProviderId}
+
+	res, err := p.apiCall("getQueueSongListFromSongIDs", params)
+	if err != nil {
+		return err
+	}
+
+	// here goes.
+	result := res.(map[string]interface{})
+	resultArray := (result["result"]).([]interface{})
+
+	if len(resultArray) == 0 {
+		return errors.New("That song no longer exists!")
+	}
+
+	resultItem := (resultArray[0]).(map[string]interface{})
+	// yay?
+
+	p.groovesharkSongToMuseBotSong(resultItem, song)
+
+	return nil
+}
+
+func (p *GroovesharkProvider) FetchSong(song *musebot.SongInfo, comms chan musebot.ProviderMessage) {
+	// this should be run inside a goroutine :P
+	// here goes
+	if song.Provider != p {
+		// what. the. hell.
+		comms <- musebot.ProviderMessage{"error", errors.New("Song was not from this provider!")}
+	}
+
+	downloadLocation := p.cacheDir + "/" + (song.ProviderId) + ".mp3"
+
+	if c, _ := doesFileExist(downloadLocation); !c {
+		// GO GO GO
+		params := map[string]interface{}{}
+		params["mobile"] = false
+		params["prefetch"] = false
+		params["songID"] = song.ProviderId
+		params["country"] = p.info.headers["country"]
+
+		comms <- musebot.ProviderMessage{"stages", 1}
+		comms <- musebot.ProviderMessage{"current_stage", 1}
+		comms <- musebot.ProviderMessage{"current_stage_description", "Downloading file..."}
+
+		res, err := p.apiCall("getStreamKeyFromSongIDEx", params)
+		if err != nil {
+			comms <- musebot.ProviderMessage{"error", err}
+			return
+		}
+
+		// now we need two pieces of iformation:
+		// the streamKey, and the ip
+		_, didFail := ((res.(map[string]interface{}))["result"]).([]interface{})
+		if didFail {
+			comms <- musebot.ProviderMessage{"error", errors.New("That song appears to no longer exist!")}
+			return
+		}
+
+		resMap := ((res.(map[string]interface{}))["result"]).(map[string]interface{})
+		resStreamKey := (resMap["streamKey"]).(string)
+		resIp := (resMap["ip"]).(string)
+
+		finalUrl := "http://" + resIp + "/stream.php?streamKey=" + resStreamKey // phew!
+		downloadFileAndReportProgress(finalUrl, downloadLocation, comms)
+
+		comms <- musebot.ProviderMessage{"done", nil}
+	} else {
+		comms <- musebot.ProviderMessage{"stages", 0}
+		// awesome
+	}
+
+	// that's actually us done! :)
 }
