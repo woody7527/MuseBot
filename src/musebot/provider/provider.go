@@ -11,6 +11,8 @@ import (
 
 type Provider musebot.Provider
 
+//type Providers musebot.Providers
+
 func Providers() []Provider {
 	return []Provider{new(GroovesharkProvider)}
 }

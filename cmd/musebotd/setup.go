@@ -1,5 +1,3 @@
-// Copyright 2012 Luke Granger-Brown. All rights reserved.
-
 package main
 
 import (
@@ -9,7 +7,6 @@ import (
 	"musebot/backend"
 	"musebot/provider"
 	"reflect"
-	"time"
 )
 
 func setupAuthenticator(config *musebot.JsonCfg) auth.Authenticator {
@@ -32,6 +29,7 @@ func setupAuthenticator(config *musebot.JsonCfg) auth.Authenticator {
 
 	log.Println(" - Using authenticator", authBackend)
 	authBackend.Setup(config.AuthBackendConfig[config.AuthBackend])
+	log.Println("   o OK!")
 
 	return authBackend
 }
@@ -58,15 +56,16 @@ func setupPlaybackBackend(config *musebot.JsonCfg) (backend.Backend, chan string
 
 	backendPipe := make(chan string)
 	backend.Setup(config.BackendConfig[config.Backend], backendPipe)
+	log.Println("   o OK!")
 
 	return backend, backendPipe
 }
 
-func setupSongProviders(config *musebot.JsonCfg) map[string]provider.Provider {
+func setupSongProviders(config *musebot.JsonCfg) musebot.Providers {
 	// Enumerate providers...
 	log.Println(" - Available providers:")
 	providers := provider.Providers()
-	providersMap := make(map[string]provider.Provider)
+	providersMap := make(musebot.Providers)
 	for i := 0; i < len(providers); i++ {
 		prv := providers[i]
 		providerName := reflect.TypeOf(prv).String()[1:]
@@ -89,47 +88,4 @@ func setupSongProviders(config *musebot.JsonCfg) map[string]provider.Provider {
 	}
 
 	return providersMap
-}
-
-func main() {
-	log.Println("MuseBot is starting up!")
-	log.Println("--- COPYRIGHT 2012 LUKE GRANGER-BROWN. ALL RIGHTS RESERVED. ---")
-	log.Println()
-
-	// Load configuration
-	log.Println("Loading configuration...")
-	config := &musebot.JsonCfg{}
-	err := config.LoadConfiguration()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	authenticator := setupAuthenticator(config)
-	log.Println()
-
-	backend, backendChan := setupPlaybackBackend(config)
-	log.Println()
-
-	providers := setupSongProviders(config)
-	log.Println()
-
-	log.Println(authenticator, backend, backendChan, providers)
-
-	searchRes, err := providers["provider.GroovesharkProvider"].Search("Escape From The City")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fetchChan := make(chan musebot.ProviderMessage, 1000)
-	time.Sleep(1)
-	log.Println(searchRes[0].Title)
-	searchRes[0].Title = "BLATANTLY WRONG"
-	log.Println(searchRes[0].Title)
-	searchRes[0].Provider.UpdateSongInfo(&searchRes[0])
-	log.Println(searchRes[0].Title)
-
-	go searchRes[0].Provider.FetchSong(&searchRes[0], fetchChan)
-
-	for {
-		log.Println(<-fetchChan)
-	}
 }

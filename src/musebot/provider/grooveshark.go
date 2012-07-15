@@ -139,7 +139,6 @@ func (p *GroovesharkProvider) apiCall(method string, parameters interface{}) (in
 	// set up the client correctly:
 	var clientObject GroovesharkClientConfig
 	if method == "getStreamKeyFromSongIDEx" {
-		log.Println("YAY")
 		clientObject = p.playback
 	} else {
 		clientObject = p.normal
@@ -213,6 +212,14 @@ func (p *GroovesharkProvider) String() string {
 	return "Grooveshark Provider by Luke Granger-Brown"
 }
 
+func (p *GroovesharkProvider) Name() string {
+	return "Grooveshark"
+}
+
+func (p *GroovesharkProvider) PackageName() string {
+	return "provider.GroovesharkProvider"
+}
+
 func (p *GroovesharkProvider) Setup(cfg map[string]string) error {
 	if cfg == nil {
 		return errors.New("Grooveshark Provider requires configuration!")
@@ -260,21 +267,30 @@ func (p *GroovesharkProvider) Setup(cfg map[string]string) error {
 	// generate an HTTP client
 	p.client = &http.Client{}
 
-	log.Println("Fetching country from Grooveshark...")
-	resp, err := p.fetchWebPage("http://html5.grooveshark.com")
-	if err != nil {
-		return err
-	}
-
-	// now we need to pull out the actual config JSON
-	// looking for "window.GS.config = " and ending with ;
-	gsConfigStart := strings.Index(resp, "window.GS.config = ") + len("window.GS.config = ")
-	gsConfigEnd := strings.Index(resp[gsConfigStart:], "};") + 1 + gsConfigStart
-
 	gsFromPage := new(groovesharkConfigHtml5)
-	err = json.Unmarshal([]byte(resp[gsConfigStart:gsConfigEnd]), gsFromPage)
-	if err != nil {
-		return err
+	forceCfg, fcok := cfg["forceConfig"]
+	if !fcok {
+		log.Println("     - Fetching configuration from Grooveshark...")
+		resp, err := p.fetchWebPage("http://html5.grooveshark.com")
+		if err != nil {
+			return err
+		}
+
+		// now we need to pull out the actual config JSON
+		// looking for "window.GS.config = " and ending with ;
+		gsConfigStart := strings.Index(resp, "window.GS.config = ") + len("window.GS.config = ")
+		gsConfigEnd := strings.Index(resp[gsConfigStart:], "};") + 1 + gsConfigStart
+
+		err = json.Unmarshal([]byte(resp[gsConfigStart:gsConfigEnd]), gsFromPage)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Println("     - Using configured Grooveshark configuration...")
+		err := json.Unmarshal([]byte(forceCfg), gsFromPage)
+		if err != nil {
+			return err
+		}
 	}
 	p.info.headers["country"] = gsFromPage.Country
 	p.info.runMode = gsFromPage.RunMode
@@ -285,8 +301,8 @@ func (p *GroovesharkProvider) Setup(cfg map[string]string) error {
 	p.info.endpoint = "more.php"
 
 	// fetching comms token
-	log.Println("Fetching communications token from Grooveshark...")
-	err = p.updateCommsToken()
+	log.Println("     - Fetching communications token from Grooveshark...")
+	err := p.updateCommsToken()
 	if err != nil {
 		return err
 	}
@@ -312,6 +328,7 @@ func (p *GroovesharkProvider) groovesharkSongToMuseBotSong(r map[string]interfac
 	song.Album = r["AlbumName"].(string)
 	song.CoverArtUrl = coverArtFn
 	song.Provider = p
+	song.ProviderName = p.PackageName()
 	song.ProviderId = r["SongID"].(string)
 }
 
@@ -338,7 +355,7 @@ func (p *GroovesharkProvider) Search(query string) ([]musebot.SongInfo, error) {
 }
 
 func (p *GroovesharkProvider) UpdateSongInfo(song *musebot.SongInfo) error {
-	if song.Provider != p {
+	if song.ProviderName != p.PackageName() {
 		// buh?
 		return errors.New("Song was not from this provider!")
 	}
@@ -370,7 +387,7 @@ func (p *GroovesharkProvider) UpdateSongInfo(song *musebot.SongInfo) error {
 func (p *GroovesharkProvider) FetchSong(song *musebot.SongInfo, comms chan musebot.ProviderMessage) {
 	// this should be run inside a goroutine :P
 	// here goes
-	if song.Provider != p {
+	if song.ProviderName != p.PackageName() {
 		// what. the. hell.
 		comms <- musebot.ProviderMessage{"error", errors.New("Song was not from this provider!")}
 	}
@@ -409,12 +426,13 @@ func (p *GroovesharkProvider) FetchSong(song *musebot.SongInfo, comms chan museb
 
 		finalUrl := "http://" + resIp + "/stream.php?streamKey=" + resStreamKey // phew!
 		downloadFileAndReportProgress(finalUrl, downloadLocation, comms)
-
-		comms <- musebot.ProviderMessage{"done", nil}
 	} else {
 		comms <- musebot.ProviderMessage{"stages", 0}
 		// awesome
 	}
 
+	song.MusicUrl = downloadLocation
+
 	// that's actually us done! :)
+	comms <- musebot.ProviderMessage{"done", nil}
 }

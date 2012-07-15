@@ -14,6 +14,12 @@ type JsonCfg struct {
 	AuthBackendConfig map[string]map[string]string
 
 	ProviderBackendConfig map[string]map[string]string
+	DefaultProvider       string
+
+	SessionStoreAuthKey []byte
+
+	ListenAddr    string
+	SslListenAddr string
 }
 
 func (cfg *JsonCfg) LoadConfiguration() (err error) {
